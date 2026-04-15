@@ -23,6 +23,24 @@ import VideoModal from '@/components/VideoModal.jsx';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getHomeContent, getPageLabels } from './home-content';
 
+import blFoodImage from '../../../images/images_partners/BLfood.jpg';
+import chilicaImage from '../../../images/images_partners/Chilica.jpg';
+import cholimexImage from '../../../images/images_partners/Cholimex.jpg';
+import cozyImage from '../../../images/images_partners/Cozy.jpg';
+import dannyGreenImage from '../../../images/images_partners/Danny_green.jpg';
+import eHerbalImage from '../../../images/images_partners/eHerbal.jpg';
+import felixImage from '../../../images/images_partners/felix.jpg';
+import grabImage from '../../../images/images_partners/grab.jpg';
+import kinhDoImage from '../../../images/images_partners/KinhDo.jpg';
+import ma6Image from '../../../images/images_partners/Ma6.jpg';
+import metfoneImage from '../../../images/images_partners/metfone.jpg';
+import omachiImage from '../../../images/images_partners/omachi.jpg';
+import taiTaiImage from '../../../images/images_partners/TaiTai.jpg';
+import thePetImage from '../../../images/images_partners/ThePet.jpg';
+import trungNguyenImage from '../../../images/images_partners/TrungNguyen.jpg';
+import viImage from '../../../images/images_partners/Vi.jpg';
+import vissanImage from '../../../images/images_partners/Vissan.jpg';
+
 function SectionTitle({ title, description }) {
   return (
     <div className="mx-auto mb-8 max-w-2xl text-center">
@@ -233,66 +251,66 @@ function HomePage() {
         </section>
 
         <section className="py-20 border-y border-border bg-muted/30 overflow-hidden relative">
-  <div className="container mx-auto px-4 mb-8 text-center">
-    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-      Trusted By Partners
-    </p>
-  </div>
+          
 
-  <div className="w-full overflow-hidden relative group">
+          <div className="w-full overflow-hidden relative group">
 
-    {/* fade edges */}
-    <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-    <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
+            {/* fade edges */}
+            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
 
-    {/* marquee */}
-    <div className="animate-marquee flex w-max flex-nowrap items-center gap-16 py-6">
+            {/* marquee */}
+            <div className="animate-marquee flex w-max flex-nowrap items-center gap-16 py-6">
 
-      {/* SET 1 */}
-      <div className="flex items-center gap-16">
-        <img src="/images/images_partners/BLfood.jpg" alt="BLFood" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Chilica.jpg" alt="Chilica" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Cholimex.jpg" alt="Cholimex" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Cozy.jpg" alt="Cozy" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Danny_green.jpg" alt="Danny Green" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/eHerbal.jpg" alt="eHerbal" className="h-10 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/felix.jpg" alt="Felix" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/grab.jpg" alt="Grab" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/KinhDo.jpg" alt="Kinh Do" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Ma6.jpg" alt="Ma6" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/metfone.jpg" alt="Metfone" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/omachi.jpg" alt="Omachi" className="h-10 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/TaiTai.jpg" alt="TaiTai" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/ThePet.jpg" alt="The Pet" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/TrungNguyen.jpg" alt="Trung Nguyen" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Vi.jpg" alt="Vi" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Vissan.jpg" alt="Vissan" className="h-12 w-auto flex-shrink-0 object-contain" />
-      </div>
+              {/* SET 1 */}
+              <div className="flex items-center gap-16">
 
-      {/* SET 2 (duplicate for infinite loop) */}
-      <div className="flex items-center gap-16">
-        <img src="/images/images_partners/BLfood.jpg" alt="BLFood" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Chilica.jpg" alt="Chilica" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Cholimex.jpg" alt="Cholimex" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Cozy.jpg" alt="Cozy" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Danny_green.jpg" alt="Danny Green" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/eHerbal.jpg" alt="eHerbal" className="h-10 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/felix.jpg" alt="Felix" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/grab.jpg" alt="Grab" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/KinhDo.jpg" alt="Kinh Do" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Ma6.jpg" alt="Ma6" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/metfone.jpg" alt="Metfone" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/omachi.jpg" alt="Omachi" className="h-10 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/TaiTai.jpg" alt="TaiTai" className="h-14 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/ThePet.jpg" alt="The Pet" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/TrungNguyen.jpg" alt="Trung Nguyen" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Vi.jpg" alt="Vi" className="h-12 w-auto flex-shrink-0 object-contain" />
-        <img src="/images/images_partners/Vissan.jpg" alt="Vissan" className="h-12 w-auto flex-shrink-0 object-contain" />
-      </div>
+                <img src={blFoodImage} alt="BLFood" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={chilicaImage} alt="Chilica" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={cholimexImage} alt="Cholimex" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={cozyImage} alt="Cozy" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={dannyGreenImage} alt="Danny Green" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={eHerbalImage} alt="eHerbal" className="h-10 w-auto flex-shrink-0 object-contain" />
+                <img src={felixImage} alt="Felix" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={grabImage} alt="Grab" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={kinhDoImage} alt="Kinh Do" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={ma6Image} alt="Ma6" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={metfoneImage} alt="Metfone" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={omachiImage} alt="Omachi" className="h-10 w-auto flex-shrink-0 object-contain" />
+                <img src={taiTaiImage} alt="TaiTai" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={thePetImage} alt="The Pet" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={trungNguyenImage} alt="Trung Nguyen" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={viImage} alt="Vi" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={vissanImage} alt="Vissan" className="h-12 w-auto flex-shrink-0 object-contain" />
 
-    </div>
-  </div>
-</section>
+              </div>
+
+              {/* SET 2 (duplicate for infinite loop) */}
+              <div className="flex items-center gap-16">
+
+                <img src={blFoodImage} alt="BLFood" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={chilicaImage} alt="Chilica" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={cholimexImage} alt="Cholimex" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={cozyImage} alt="Cozy" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={dannyGreenImage} alt="Danny Green" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={eHerbalImage} alt="eHerbal" className="h-10 w-auto flex-shrink-0 object-contain" />
+                <img src={felixImage} alt="Felix" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={grabImage} alt="Grab" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={kinhDoImage} alt="Kinh Do" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={ma6Image} alt="Ma6" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={metfoneImage} alt="Metfone" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={omachiImage} alt="Omachi" className="h-10 w-auto flex-shrink-0 object-contain" />
+                <img src={taiTaiImage} alt="TaiTai" className="h-14 w-auto flex-shrink-0 object-contain" />
+                <img src={thePetImage} alt="The Pet" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={trungNguyenImage} alt="Trung Nguyen" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={viImage} alt="Vi" className="h-12 w-auto flex-shrink-0 object-contain" />
+                <img src={vissanImage} alt="Vissan" className="h-12 w-auto flex-shrink-0 object-contain" />
+
+              </div>
+
+            </div>
+          </div>
+        </section>
 
         <section className="bg-muted/30 pt-12 pb-0 md:pt-14 md:pb-0">
           <div className="container mx-auto px-4">
@@ -317,9 +335,9 @@ function HomePage() {
           onCtaClick={scrollToLeadCapture}
         />
         <VideoPlayButton onClick={() => setIsVideoOpen(true)} />
-        <VideoModal 
-          isOpen={isVideoOpen} 
-          onClose={() => setIsVideoOpen(false)} 
+        <VideoModal
+          isOpen={isVideoOpen}
+          onClose={() => setIsVideoOpen(false)}
         />
       </main>
 
