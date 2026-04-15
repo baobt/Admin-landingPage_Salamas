@@ -6,7 +6,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -19,6 +19,8 @@ const initial = {
   files: [],
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 const labelsByLanguage = {
   vi: {
     fullName: 'Họ và tên',
@@ -26,19 +28,16 @@ const labelsByLanguage = {
     email: 'Email',
     phone: 'Số điện thoại',
     phonePlaceholder: '+84 123 456 789',
-
     userType: 'Loại người dùng',
     userTypePlaceholder: 'Chọn loại người dùng',
     buyer: 'Người mua',
     seller: 'Người bán',
     distributor: 'Nhà phân phối',
-
     plan: 'Gói đăng ký',
     planPlaceholder: 'Chọn gói',
     basic: 'BASIC - 50$',
     premium: 'PREMIUM - 100$',
     enterprise: 'ENTERPRISE - 200$',
-
     file: 'Tải file PDF (tối đa 3 file)',
     submit: 'Đăng ký ngay',
     loading: 'Đang gửi...',
@@ -48,67 +47,9 @@ const labelsByLanguage = {
     invalidFile: 'Chỉ chấp nhận file PDF',
     remove: 'Xóa',
   },
-
-  en: {
-    fullName: 'Full name',
-    fullNamePlaceholder: 'John Doe',
-    email: 'Email',
-    phone: 'Phone number',
-    phonePlaceholder: '+84 123 456 789',
-
-    userType: 'User type',
-    userTypePlaceholder: 'Select user type',
-    buyer: 'Buyer',
-    seller: 'Seller',
-    distributor: 'Distributor',
-
-    plan: 'Subscription Plan',
-    planPlaceholder: 'Select plan',
-    basic: 'BASIC - 50$',
-    premium: 'PREMIUM - 100$',
-    enterprise: 'ENTERPRISE - 200$',
-
-    file: 'Upload PDF (max 3 files)',
-    submit: 'Register now',
-    loading: 'Submitting...',
-    success: 'Success!',
-    error: 'Error occurred!',
-    fileLimit: 'Max 3 files allowed',
-    invalidFile: 'Only PDF allowed',
-    remove: 'Remove',
-  },
-
-  km: {
-    fullName: 'ឈ្មោះពេញ',
-    fullNamePlaceholder: 'សុខ ដារ៉ា',
-    email: 'អ៊ីមែល',
-    phone: 'លេខទូរស័ព្ទ',
-    phonePlaceholder: '+855 12 345 678',
-
-    userType: 'ប្រភេទអ្នកប្រើ',
-    userTypePlaceholder: 'ជ្រើសរើស',
-    buyer: 'អ្នកទិញ',
-    seller: 'អ្នកលក់',
-    distributor: 'អ្នកចែកចាយ',
-
-    plan: 'កញ្ចប់',
-    planPlaceholder: 'ជ្រើសរើសកញ្ចប់',
-    basic: 'BASIC - 50$',
-    premium: 'PREMIUM - 100$',
-    enterprise: 'ENTERPRISE - 200$',
-
-    file: 'បញ្ចូល PDF (អតិបរមា 3)',
-    submit: 'ចុះឈ្មោះ',
-    loading: 'កំពុងផ្ញើ...',
-    success: 'ជោគជ័យ!',
-    error: 'មានកំហុស!',
-    fileLimit: 'អាចបញ្ចូលបានតែ 3 file',
-    invalidFile: 'ត្រូវជា PDF ប៉ុណ្ណោះ',
-    remove: 'លុប',
-  },
 };
 
-export default function LeadCaptureForm({ language = 'vi' }) {
+export default function LeadCaptureForm({ language = 'vi', formId }) {
   const [form, setForm] = useState(initial);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -119,17 +60,14 @@ export default function LeadCaptureForm({ language = 'vi' }) {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  //  MULTI FILE HANDLER 
   const handleFilesChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
+    const selectedFiles = Array.from(e.target.files || []);
 
-    // limit 3
     if (form.files.length + selectedFiles.length > 3) {
       alert(labels.fileLimit);
       return;
     }
 
-    // validate PDF
     const validFiles = selectedFiles.filter(
       (file) => file.type === 'application/pdf'
     );
@@ -167,12 +105,11 @@ export default function LeadCaptureForm({ language = 'vi' }) {
       formData.append('userType', form.userType);
       formData.append('plan', form.plan);
 
-      //  MULTIPLE FILES
       form.files.forEach((file) => {
-        formData.append('files[]', file);
+        formData.append('files', file);
       });
 
-      const res = await fetch('/api.php', {
+      const res = await fetch(`${API_BASE_URL}/api/leads`, {
         method: 'POST',
         body: formData,
       });
@@ -194,9 +131,9 @@ export default function LeadCaptureForm({ language = 'vi' }) {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    <form id={formId} onSubmit={submit} className="space-y-6">
 
-      {/* Name */}
+      {/* NAME */}
       <div>
         <Label>{labels.fullName}</Label>
         <Input
@@ -207,7 +144,7 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         />
       </div>
 
-      {/* Email */}
+      {/* EMAIL */}
       <div>
         <Label>{labels.email}</Label>
         <Input
@@ -218,7 +155,7 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         />
       </div>
 
-      {/* Phone */}
+      {/* PHONE */}
       <div>
         <Label>{labels.phone}</Label>
         <Input
@@ -229,10 +166,13 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         />
       </div>
 
-      {/* User Type */}
+      {/* USER TYPE */}
       <div>
         <Label>{labels.userType}</Label>
-        <Select onValueChange={(v) => handleChange('userType', v)}>
+        <Select
+          value={form.userType}
+          onValueChange={(v) => handleChange('userType', v)}
+        >
           <SelectTrigger>
             <SelectValue placeholder={labels.userTypePlaceholder} />
           </SelectTrigger>
@@ -244,10 +184,13 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         </Select>
       </div>
 
-      {/* Plan */}
+      {/* PLAN */}
       <div>
         <Label>{labels.plan}</Label>
-        <Select onValueChange={(v) => handleChange('plan', v)}>
+        <Select
+          value={form.plan}
+          onValueChange={(v) => handleChange('plan', v)}
+        >
           <SelectTrigger>
             <SelectValue placeholder={labels.planPlaceholder} />
           </SelectTrigger>
@@ -259,7 +202,7 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         </Select>
       </div>
 
-      {/* file upload */}
+      {/* FILE */}
       <div>
         <Label>{labels.file}</Label>
         <Input
@@ -269,11 +212,10 @@ export default function LeadCaptureForm({ language = 'vi' }) {
           onChange={handleFilesChange}
         />
 
-        {/* preview */}
         <div className="mt-2 space-y-1">
           {form.files.map((file, index) => (
             <div
-              key={index}
+              key={`${file.name}-${index}`}
               className="flex items-center justify-between text-sm bg-muted px-3 py-2 rounded"
             >
               <span>📄 {file.name}</span>
@@ -289,8 +231,13 @@ export default function LeadCaptureForm({ language = 'vi' }) {
         </div>
       </div>
 
+      {/* SUBMIT */}
       <Button disabled={loading || done} className="w-full">
-        {loading ? labels.loading : done ? labels.success : labels.submit}
+        {loading
+          ? labels.loading
+          : done
+          ? labels.success
+          : labels.submit}
       </Button>
     </form>
   );

@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Vite specific
+/public/build
+
+# Keys / Secrets
+*.pem
+*.key
+*.cert
+*.jks
+
+
+.env
+.env.local
+.env.*.local
+
+data/leads*.json
+uploads/

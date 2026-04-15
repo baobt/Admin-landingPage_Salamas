@@ -7,6 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Environment (covers web/.env)
+.env
+.env.local
+.env.*.local
+web/.env*
+
+# Runtime data (if any)
+data/leads*.json
+uploads/
+
+# Vite specific
+/public/build
+web/dist
+
+# Keys / Secrets
+*.pem
+*.key
+*.cert
+
 node_modules
 dist
 dist-ssr

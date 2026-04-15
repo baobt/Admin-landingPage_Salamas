@@ -70,7 +70,7 @@ function FeaturesSection({
         <div className="relative z-10">
           <h3 className="text-2xl font-semibold mb-4 text-center">{systemTitle}</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.system.map((feature, index) => (
+{(features.system || []).map((feature, index) => (
               <FeatureCard key={feature.title} {...feature} index={index} cardClassName="shadow-xl hover:shadow-2xl" />
             ))}
           </div>

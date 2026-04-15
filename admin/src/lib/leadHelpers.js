@@ -1,4 +1,5 @@
-export const normalize = (str) => (str || "").toLowerCase().trim();
+export const normalize = (str) =>
+  (str || "").toString().toLowerCase().trim();
 
 export const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1) : "N/A";
@@ -8,37 +9,54 @@ export const safeDate = (value) => {
   return isNaN(d.getTime()) ? null : d;
 };
 
-// 🔥 handle mọi kiểu backend
+//  extract files từ mọi backend format
 export const extractFiles = (lead) => {
+  if (!lead) return [];
+
+  // case 1: fileUrls
   if (Array.isArray(lead.fileUrls)) return lead.fileUrls;
-  if (Array.isArray(lead.files)) return lead.files;
+
+  // case 2: files raw array
+  if (Array.isArray(lead.files)) {
+    return lead.files
+      .map((item) => (typeof item === "string" ? item : item?.url))
+      .filter(Boolean);
+  }
+
+  // case 3: single fileUrl
   if (lead.fileUrl) return [lead.fileUrl];
+
   return [];
 };
 
-// 🎯 map data
+//  normalize lead data
 export const mapLead = (lead, index) => ({
-  id: lead.id ?? `${lead.email || "unknown"}-${index}`,
+  id: lead?.id ?? `${lead?.email || "unknown"}-${index}`,
 
-  name: lead.name || lead.fullName || "N/A",
-  email: lead.email || "N/A",
-  phone: lead.phone || lead.phoneNumber || "N/A",
+  name: lead?.name || lead?.fullName || "N/A",
+  email: lead?.email || "N/A",
+  phone: lead?.phone || lead?.phoneNumber || "N/A",
 
-  userType: normalize(lead.userType),
-  plan: normalize(lead.plan),
+  userType: normalize(lead?.userType),
+  plan: normalize(lead?.plan),
 
-  createdAt: lead.createdAt || lead.submissionTime || null,
+  createdAt: lead?.createdAt || lead?.submissionTime || null,
 
   fileUrls: extractFiles(lead),
 });
 
-// 🔍 search
+//  search filter
 export const matchesSearch = (lead, query) => {
   const q = normalize(query);
+  if (!q) return true;
 
-  return (
-    normalize(lead.name).includes(q) ||
-    normalize(lead.email).includes(q) ||
-    normalize(lead.phone).includes(q)
-  );
+  const fields = [
+    lead?.name,
+    lead?.email,
+    lead?.phone,
+    lead?.userType,
+    lead?.plan,
+  ];
+
+  return fields.some((f) => normalize(f).includes(q));
 };

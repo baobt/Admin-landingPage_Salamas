@@ -1,16 +1,32 @@
-# React + Vite
+# Salamass Admin Dashboard - React + Vite + Tailwind + Shadcn UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Quick Start
 
-Currently, two official plugins are available:
+```bash
+cd admin
+npm install
+npm run dev  # http://localhost:5174 (or check terminal)
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Build & Deploy
 
-## React Compiler
+```bash
+npm run build  # /dist
+npm run preview
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Deploy `dist/` to Vercel/Netlify subdomain (admin.salamass.com).
 
-## Expanding the ESLint configuration
+## Environment
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Copy `.env.example` to `.env`:
+```
+VITE_API_URL=https://salamass.com/api/leads.php  # For lead data fetch
+```
+
+## Features
+- Leads management table with filters, file uploads.
+- Shadcn UI components.
+
+## Backend Integration
+Admin fetches leads from main site's PHP API (add /api/leads.php to return JSON leads from DB/email log).
