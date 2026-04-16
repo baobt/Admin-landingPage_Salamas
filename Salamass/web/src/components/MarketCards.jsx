@@ -107,17 +107,6 @@ export function CategoryCard({
       <Card className="product-card premium-product-card overflow-hidden border-none group">
         <div ref={mediaRef} className="relative h-56 overflow-hidden premium-product-media">
           <img src={image} alt={title} className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${imageClassName}`} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImage; }} />
-          {hoverVideo ? (
-            <video
-              ref={videoRef}
-              src={hoverVideo}
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100"
-            />
-          ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.17), transparent 48%)' }} />
           <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500"><ArrowUpRight className="w-5 h-5 text-white" /></div>

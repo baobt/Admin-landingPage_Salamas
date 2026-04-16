@@ -75,6 +75,11 @@ const contentByLanguage = {
       { value: ' Bán hàng đa kênh', label: 'TMDT, Fanpage, TikTok trong một hệ thống' },
       { value: ' Vận hành & giao hàng nhanh', label: 'Kho tại Campuchia – giao hàng chỉ trong vài giờ' },
     ],
+    demoImages: {
+    product: 'https://your-default-product-image.jpg',
+    dashboard: 'https://your-default-dashboard.jpg',
+    chat: 'https://your-default-chat.jpg',
+  },
     features: {
       buyer: [
         { icon: Search, title: 'Tìm kiếm AI', description: 'Gợi ý và lọc sản phẩm thông minh.' },
@@ -124,8 +129,8 @@ const contentByLanguage = {
   title: 'Salamass khác biệt như thế nào?',
   description: 'Salamass không chỉ là sàn TMĐT. Chúng tôi cung cấp giải pháp bán hàng toàn diện kết hợp 3 trụ cột: nền tảng thương mại điện tử, marketing đa kênh và logistics tích hợp, giúp doanh nghiệp tăng trưởng nhanh tại thị trường Cambodia.',
 
-  image: marketingPoster,           // 👈 FIX: dùng ảnh local
-  video: khacbiet2SectionVideo,     // 👈 video
+  image: marketingPoster,           
+  video: khacbiet2SectionVideo,     
 
   imageAlt: 'Giải pháp thương mại điện tử, marketing và logistics tích hợp',
       benefits: [
@@ -208,6 +213,11 @@ comparisonSection: {
       { value: ' Omnichannel selling', label: 'E-commerce, Fanpage, TikTok in one system' },
       { value: ' Fast operations & delivery', label: 'Warehouse in Cambodia – deliver within hours' },
     ],
+    demoImages: {
+    product: 'https://your-default-product-image.jpg',
+    dashboard: 'https://your-default-dashboard.jpg',
+    chat: 'https://your-default-chat.jpg',
+  },
     features: {
       buyer: [
         { icon: Search, title: 'AI Search', description: 'Smart product suggestion and filtering.' },
@@ -341,6 +351,11 @@ comparisonSection: {
       { value: ' លក់ពហុឆានែល', label: 'E-commerce, Fanpage, TikTok ក្នុងប្រព័ន្ធតែមួយ' },
       { value: ' ប្រតិបត្តិការ និងដឹកជញ្ជូនលឿន', label: 'ឃ្លាំងនៅកម្ពុជា – ដឹកជញ្ជូនក្នុងរយៈពេលប៉ុន្មានម៉ោង' },
     ],
+    demoImages: {
+    product: 'https://your-default-product-image.jpg',
+    dashboard: 'https://your-default-dashboard.jpg',
+    chat: 'https://your-default-chat.jpg',
+  },
     features: {
       buyer: [
         { icon: Search, title: 'ស្វែងរកដោយ AI', description: 'ណែនាំ និងតម្រៀបផលិតផលឆ្លាតវៃ។' },
@@ -590,6 +605,28 @@ const pageLabels = {
     productLabel: 'ផលិតផល',   videoIntro: 'ការណែនាំអំពី Salamass',  },
 };
 
+const CMS_LABEL_KEYS = [
+  'heroTitle',
+  'heroDescription',
+  'leadTitle',
+  'leadDesc',
+  'categoriesTitle',
+  'categoriesDesc',
+  'faqTitle',
+];
+
+const CMS_PRODUCT_PREFIXES = ['product1', 'product2', 'product3', 'product4'];
+const CMS_SERVICE_PREFIXES = ['serviceBasic', 'servicePremium', 'serviceEnterprise'];
+
+function pickCmsValue(cmsEntries, key, fallbackValue) {
+  const value = cmsEntries?.[key];
+  if (typeof value !== 'string') {
+    return fallbackValue;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? value : fallbackValue;
+}
+
 export function getHomeContent(language = 'vi') {
   const lang = contentByLanguage[language] ? language : 'vi';
   return contentByLanguage[lang];
@@ -598,4 +635,82 @@ export function getHomeContent(language = 'vi') {
 export function getPageLabels(language = 'vi') {
   const lang = pageLabels[language] ? language : 'vi';
   return pageLabels[lang];
+}
+
+export function getCmsAwareHomeData(language = 'vi', cmsContentByLanguage = {}) {
+  const lang = contentByLanguage[language] ? language : 'vi';
+  const cmsEntries = cmsContentByLanguage?.[lang] || {};
+
+  const baseContent = contentByLanguage[lang];
+  const baseLabels = pageLabels[lang];
+
+  const labels = {
+    ...baseLabels,
+    ...Object.fromEntries(
+      CMS_LABEL_KEYS.map((key) => [key, pickCmsValue(cmsEntries, key, baseLabels[key])])
+    ),
+  };
+
+  const stats = [
+    {
+      value: pickCmsValue(cmsEntries, 'stats_1_value', baseContent.stats?.[0]?.value),
+      label: pickCmsValue(cmsEntries, 'stats_1_label', baseContent.stats?.[0]?.label),
+    },
+    {
+      value: pickCmsValue(cmsEntries, 'stats_2_value', baseContent.stats?.[1]?.value),
+      label: pickCmsValue(cmsEntries, 'stats_2_label', baseContent.stats?.[1]?.label),
+    },
+    {
+      value: pickCmsValue(cmsEntries, 'stats_3_value', baseContent.stats?.[2]?.value),
+      label: pickCmsValue(cmsEntries, 'stats_3_label', baseContent.stats?.[2]?.label),
+    },
+  ];
+
+  const categories = baseContent.categories.map((category, index) => {
+    const prefix = CMS_PRODUCT_PREFIXES[index];
+    if (!prefix) return category;
+
+    return {
+      ...category,
+      title: pickCmsValue(cmsEntries, `${prefix}Title`, category.title),
+      description: pickCmsValue(cmsEntries, `${prefix}Description`, category.description),
+      image: pickCmsValue(cmsEntries, `${prefix}Image`, category.image),
+      productCount: pickCmsValue(cmsEntries, `${prefix}Count`, category.productCount),
+    };
+  });
+
+  const plans = baseContent.servicePricing.plans.map((plan, index) => {
+    const prefix = CMS_SERVICE_PREFIXES[index];
+    if (!prefix) return plan;
+
+    return {
+      ...plan,
+      name: pickCmsValue(cmsEntries, `${prefix}Name`, plan.name),
+      description: pickCmsValue(cmsEntries, `${prefix}Description`, plan.description),
+      price: pickCmsValue(cmsEntries, `${prefix}Price`, plan.price),
+      period: pickCmsValue(cmsEntries, `${prefix}Period`, plan.period),
+    };
+  });
+
+ const demoImages = {
+  product: pickCmsValue(cmsEntries, 'demo_product_image', baseContent.demo_product_image),
+  dashboard: pickCmsValue(cmsEntries, 'demo_dashboard_image', baseContent.demo_dashboard_image),
+  chat: pickCmsValue(cmsEntries, 'demo_chat_image', baseContent.demo_chat_image),
+};
+
+  return {
+  labels,
+  content: {
+    ...baseContent,
+    stats, 
+    categories,
+     demoImages,
+    servicePricing: {
+      ...baseContent.servicePricing,
+      badge: pickCmsValue(cmsEntries, 'servicePricingBadge', baseContent.servicePricing.badge),
+      title: pickCmsValue(cmsEntries, 'servicePricingTitle', baseContent.servicePricing.title),
+      plans,
+    },
+  },
+};
 }

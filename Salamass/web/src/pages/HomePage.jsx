@@ -21,7 +21,7 @@ import HomeComparisonSection from '@/components/HomeComparisonSection.jsx';
 import VideoPlayButton from '@/components/VideoPlayButton.jsx';
 import VideoModal from '@/components/VideoModal.jsx';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getHomeContent, getPageLabels } from './home-content';
+import { getCmsAwareHomeData } from './home-content';
 
 import blFoodImage from '../../../images/images_partners/BLfood.jpg';
 import chilicaImage from '../../../images/images_partners/Chilica.jpg';
@@ -52,9 +52,35 @@ function SectionTitle({ title, description }) {
 
 function HomePage() {
   const { language } = useLanguage();
-  const content = getHomeContent(language);
-  const labels = getPageLabels(language);
+  const [cmsContent, setCmsContent] = useState({});
+  const { content, labels } = getCmsAwareHomeData(language, cmsContent);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+    const fetchCmsContent = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/content`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        if (payload?.success && payload?.data) {
+          setCmsContent(payload.data);
+        }
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          setCmsContent({});
+        }
+      }
+    };
+
+    fetchCmsContent();
+    return () => controller.abort();
+  }, []);
 
   const scrollToLeadCapture = () => {
     const leadCaptureSection = document.getElementById('lead-capture');
@@ -67,6 +93,20 @@ function HomePage() {
     ecosystemNodes, targetMarkets, competitiveAdvantages, comparisonSection, servicePricing, sellerFaqs,
   } = content;
 
+  // const  = [
+  //   {
+  //     value: labels.stats_1_value || 'Mở rộng sang Campuchia',
+  //     label: labels.stats_1_label || 'Tiếp cận hàng triệu khách hàng mới với chi phí thấp',
+  //   },
+  //   {
+  //     value: labels.stats_2_value || 'Bán hàng đa kênh',
+  //     label: labels.stats_2_label || 'TMDT, Fanpage, TikTok trong một hệ thống',
+  //   },
+  //   {
+  //     value: labels.stats_3_value || 'Vận hành & giao hàng nhanh',
+  //     label: labels.stats_3_label || 'Kho tại Campuchia – giao hàng chỉ trong vài giờ',
+  //   },
+  // ];
   return (
     <>
       <Helmet>
@@ -205,7 +245,10 @@ function HomePage() {
         <section className="bg-muted/30 pt-4 pb-12 md:pt-6 md:pb-14">
           <div className="container mx-auto px-4">
             <SectionTitle title={labels.demoTitle} />
-            <ProductDemoSection labels={labels.demoTabs} />
+            <ProductDemoSection
+              labels={content.demoTabs}
+              images={content.demoImages}
+            />
           </div>
         </section>
 
@@ -251,7 +294,7 @@ function HomePage() {
         </section>
 
         <section className="py-20 border-y border-border bg-muted/30 overflow-hidden relative">
-          
+
 
           <div className="w-full overflow-hidden relative group">
 

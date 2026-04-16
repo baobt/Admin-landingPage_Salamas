@@ -70,6 +70,14 @@ export async function initDatabase() {
       UNIQUE KEY uniq_language_key (language, content_key)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS content_versions (
+      id CHAR(36) PRIMARY KEY,
+      snapshot_json LONGTEXT NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
 }
 
 export default pool;

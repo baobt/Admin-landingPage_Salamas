@@ -2,37 +2,44 @@ import { useEffect, useState } from 'react';
 import { LeadsTable } from './components/leads/LeadsTable.jsx';
 import { Button } from './components/ui/button.jsx';
 import { Input } from './components/ui/input.jsx';
-
+import { EDITABLE_GROUPS } from './config/editableGroups';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const LANG_OPTIONS = ['vi', 'en', 'km'];
 
-const EDITABLE_FIELDS = [
-  'heroTitle',
-  'heroDescription',
-  'leadTitle',
-  'leadDesc',
-  'categoriesTitle',
-  'faqTitle',
-];
-
-function ContentEditor({ content, onChange, selectedLanguage }) {
+function ContentEditor({ content, onChange, onRestoreField, selectedLanguage, selectedVersionId }) {
   const selected = content?.[selectedLanguage] || {};
 
   return (
-    <div className="space-y-4">
-      {EDITABLE_FIELDS.map((field) => (
-        <div key={field} className="space-y-2">
-          <label className="block text-sm font-medium text-slate-700">
-            {field}
-          </label>
-          <Input
-            value={selected[field] || ''}
-            onChange={(e) =>
-              onChange(selectedLanguage, field, e.target.value)
-            }
-            placeholder={`Nhập ${field}`}
-          />
+    <div className="space-y-10">
+      {EDITABLE_GROUPS.map((group) => (
+        <div key={group.label} className="space-y-4">
+
+          {/* SECTION HEADER */}
+          <h2 className="text-lg font-semibold text-slate-800 border-b pb-2">
+            {group.label}
+          </h2>
+
+          {/* FIELDS GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {group.fields.map((field) => (
+              <div key={field} className="space-y-1">
+
+                <label className="block text-sm font-medium text-slate-600">
+                  {field}
+                </label>
+
+                <Input
+                  value={selected[field] || ''}
+                  onChange={(e) =>
+                    onChange(selectedLanguage, field, e.target.value)
+                  }
+                  placeholder={`Enter ${field}`}
+                />
+              </div>
+            ))}
+          </div>
+
         </div>
       ))}
     </div>
@@ -46,6 +53,7 @@ export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('vi');
   const [loading, setLoading] = useState(false);
 
+  /* FETCH LEADS */
   const fetchLeads = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/leads`);
@@ -56,6 +64,7 @@ export default function App() {
     }
   };
 
+  /* FETCH CONTENT */
   const fetchContent = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/content`);
@@ -71,16 +80,18 @@ export default function App() {
     fetchContent();
   }, []);
 
+  /* UPDATE FIELD */
   const updateContentField = (language, field, value) => {
     setContent((prev) => ({
       ...prev,
       [language]: {
-        ...(prev[language] || {}),
+        ...(prev[language] || []),
         [field]: value,
       },
     }));
   };
 
+  /* SAVE CONTENT */
   const saveContent = async () => {
     setLoading(true);
     try {
@@ -121,7 +132,7 @@ export default function App() {
 
       <main className="mx-auto max-w-7xl px-6 py-10 space-y-8">
 
-        {/* Tabs */}
+        {/* TABS */}
         <div className="flex gap-2">
           <Button
             variant={activeTab === 'leads' ? 'default' : 'outline'}
@@ -142,14 +153,14 @@ export default function App() {
           </Button>
         </div>
 
-        {/* LEADS TAB */}
+        {/* LEADS */}
         {activeTab === 'leads' && <LeadsTable leads={leads} />}
 
-        {/* CONTENT TAB */}
+        {/* CONTENT */}
         {activeTab === 'content' && (
           <section className="border rounded-xl p-6 space-y-6">
 
-            {/* language switch */}
+            {/* LANGUAGE SWITCH */}
             <div className="flex gap-2">
               {LANG_OPTIONS.map((lang) => (
                 <Button
@@ -162,15 +173,18 @@ export default function App() {
               ))}
             </div>
 
+            {/* EDITOR */}
             <ContentEditor
               content={content}
               onChange={updateContentField}
               selectedLanguage={selectedLanguage}
             />
 
+            {/* SAVE */}
             <Button onClick={saveContent} disabled={loading}>
               {loading ? 'Đang lưu...' : 'Lưu content'}
             </Button>
+
           </section>
         )}
       </main>
