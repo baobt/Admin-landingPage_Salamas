@@ -3,10 +3,7 @@ export const EDITABLE_GROUPS = [
     label: '🔥 HERO SECTION',
     fields: ['heroTitle', 'heroDescription'],
   },
-  {
-    label: '💰 PRICING HEADER',
-    fields: ['servicePricingBadge', 'servicePricingTitle'],
-  },
+
   {
     label: '📊 STATS SECTION',
     fields: [
@@ -45,6 +42,10 @@ export const EDITABLE_GROUPS = [
       'product4Image',
       'product4Count',
     ],
+  },
+  {
+    label: '💰 PRICING HEADER',
+    fields: ['servicePricingBadge', 'servicePricingTitle'],
   },
   {
     label: '💳 BASIC PLAN',

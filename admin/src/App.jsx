@@ -51,26 +51,31 @@ function Dashboard() {
 
   /* FETCH LEADS */
   const fetchLeads = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/leads`);
-      const data = await res.json();
-      setLeads(data?.data || []);
-    } catch {
-      setLeads([]);
+  const token = localStorage.getItem('token');
+
+  const res = await fetch(`${API_BASE_URL}/api/leads`, {
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-  };
+  });
+
+  const data = await res.json();
+  setLeads(data?.data || []);
+};
 
   /* FETCH CONTENT */
   const fetchContent = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/content`);
-      const data = await res.json();
-      setContent(data?.data || {});
-    } catch {
-      setContent({});
-    }
-  };
+  const token = localStorage.getItem('token');
 
+  const res = await fetch(`${API_BASE_URL}/api/content`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+  setContent(data?.data || {});
+};
   useEffect(() => {
     fetchLeads();
     fetchContent();
@@ -88,29 +93,35 @@ function Dashboard() {
   };
 
   /* SAVE CONTENT */
-  const saveContent = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/content`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(content),
-      });
+ const saveContent = async () => {
+  setLoading(true);
 
-      const data = await res.json();
+  try {
+    const token = localStorage.getItem("token");
 
-      if (!data.success) {
-        alert(data.message || 'Save failed');
-      } else {
-        alert('Saved successfully');
-      }
-    } catch {
-      alert('Backend error');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await fetch(`${API_BASE_URL}/api/content`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(content),
+    });
 
+    const data = await res.json();
+    console.log("SAVE RESPONSE:", data);
+
+    // 🔥 QUAN TRỌNG: reload lại data
+    await fetchContent();
+
+    alert("Save successful!");
+  } catch (err) {
+    console.error(err);
+    alert("Save failed!");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen">
       {/* HEADER */}
@@ -174,13 +185,13 @@ function Dashboard() {
 /* ================= APP (LOGIN FLOW) ================= */
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem('auth') === '1'
+     !!localStorage.getItem('token')
   );
 
-  const handleLoginSuccess = () => {
-    localStorage.setItem('auth', '1');
-    setIsLoggedIn(true);
-  };
+  const handleLoginSuccess = (token) => {
+  localStorage.setItem('token', token);
+  setIsLoggedIn(true);
+};
 
   const handleLogout = () => {
     localStorage.removeItem('auth');

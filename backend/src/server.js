@@ -7,12 +7,19 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import 'dotenv/config';
 import { initDatabase, query, withTransaction } from '../data/mysql.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+// import defaultContent from '../data/defaultContent.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const uploadsDir = path.join(rootDir, 'uploads');
 const PORT = Number(process.env.PORT || 4000);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+
 
 const defaultContent = {
   vi: {
@@ -199,6 +206,7 @@ const defaultContent = {
   demo_chat_image: 'https://your-default-chat.jpg',
   },
 };
+
 function flattenContent(contentMap) {
   return Object.entries(contentMap).flatMap(([language, entries]) =>
     Object.entries(entries).map(([contentKey, contentValue]) => ({ language, contentKey, contentValue }))
@@ -213,15 +221,46 @@ function unflattenContent(rows) {
   }, {});
 }
 
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return { salt, hash };
+}
+
+function verifyPassword(password, expectedHash, salt) {
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return hash === expectedHash;
+}
+
+async function seedAdminAccount() {
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) return;
+
+  const rows = await query(
+    'SELECT id FROM admin_accounts WHERE email = ?',
+    [ADMIN_EMAIL]
+  );
+
+  if (rows.length > 0) return; // ❗ CHỈ CREATE 1 LẦN
+
+  const hash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
+  await query(
+  `INSERT INTO admin_accounts (id, email, password_hash)
+   VALUES (?, ?, ?)`,
+  [crypto.randomUUID(), ADMIN_EMAIL, hash]
+);
+}
+
 
 async function seedDefaultContent() {
   const items = flattenContent(defaultContent);
+
   await withTransaction(async (connection) => {
     for (const item of items) {
       await connection.execute(
         `INSERT INTO content_entries (language, content_key, content_value)
          VALUES (?, ?, ?)
-         ON DUPLICATE KEY UPDATE content_value = content_value`,
+         ON DUPLICATE KEY UPDATE content_value = VALUES(content_value)`,
         [item.language, item.contentKey, item.contentValue]
       );
     }
@@ -268,7 +307,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/leads', async (_req, res, next) => {
+app.get('/api/leads', authMiddleware, async (_req, res, next) => {
   try {
     const rows = await query(
       `SELECT
@@ -370,15 +409,95 @@ app.post('/api/leads', upload.array('files', 3), async (req, res, next) => {
   }
 });
 
-app.get('/api/content', async (_req, res, next) => {
+app.post('/api/login', async (req, res, next) => {
   try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and password are required'
+      });
+    }
+
     const rows = await query(
-      `SELECT language, content_key, content_value
-       FROM content_entries
-       ORDER BY language, content_key`
+      'SELECT * FROM admin_accounts WHERE email = ?',
+      [email]
     );
 
-    res.json({ success: true, data: unflattenContent(rows) });
+    const admin = rows[0];
+
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password_hash);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        adminId: admin.id,
+        email: admin.email
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.json({
+      success: true,
+      token
+    });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+
+  if (!header) {
+    return res.status(401).json({ message: 'No token' });
+  }
+
+  try {
+    const token = header.split(' ')[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.admin = decoded;
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+}
+
+app.get('/api/content', async (_req, res, next) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+
+    const rows = await query(`
+      SELECT language, content_key, content_value
+      FROM content_entries
+      ORDER BY language, content_key
+    `);
+
+    res.json({
+      success: true,
+      data: unflattenContent(rows)
+    });
+
+    
   } catch (error) {
     next(error);
   }
@@ -386,30 +505,27 @@ app.get('/api/content', async (_req, res, next) => {
 
 app.put('/api/content', async (req, res, next) => {
   try {
-    const payload = req.body;
+    
 
-    if (!payload || typeof payload !== 'object') {
-      res.status(400).json({ success: false, message: 'Invalid content payload' });
-      return;
-    }
+    await withTransaction(async (conn) => {
+      await conn.query("DELETE FROM content_entries");
 
-    const items = flattenContent(payload);
-
-    await withTransaction(async (connection) => {
-      await connection.execute('DELETE FROM content_entries');
-
-      for (const item of items) {
-        await connection.execute(
-          `INSERT INTO content_entries (language, content_key, content_value)
-           VALUES (?, ?, ?)
-           ON DUPLICATE KEY UPDATE content_value = VALUES(content_value)`,
-          [item.language, item.contentKey, item.contentValue]
-        );
+      for (const [lang, fields] of Object.entries(req.body)) {
+        for (const [key, value] of Object.entries(fields)) {
+          await conn.query(
+            `INSERT INTO content_entries (language, content_key, content_value)
+             VALUES (?, ?, ?)`,
+            [lang, key, value]
+          );
+        }
       }
     });
 
-    res.json({ success: true, data: payload });
+    
+
+    res.json({ success: true });
   } catch (error) {
+    
     next(error);
   }
 });
@@ -423,7 +539,8 @@ async function start() {
   try {
     await fs.mkdir(uploadsDir, { recursive: true });
     await initDatabase();
-     await seedDefaultContent();
+    await seedDefaultContent();
+    await seedAdminAccount();
 
     app.listen(PORT, () => {
       console.log(`Salamass backend listening on http://localhost:${PORT}`);

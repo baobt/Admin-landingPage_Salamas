@@ -7,12 +7,35 @@ export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (email.trim() && password.trim()) {
-      onLoginSuccess?.();
+    if (!email.trim() || !password.trim()) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        alert(data.message || 'Invalid login');
+        return;
+      }
+
+      if (data.success) {
+  localStorage.setItem('token', data.token);
+  onLoginSuccess?.(data.token);
+}
+    } catch {
+      alert('Login failed');
     }
   };
 
