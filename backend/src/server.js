@@ -503,6 +503,32 @@ app.get('/api/content', async (_req, res, next) => {
   }
 });
 
+const imageStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `img-${Date.now()}${ext}`);
+  },
+});
+
+const uploadImage = multer({
+  storage: imageStorage,
+  limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image files allowed'));
+    }
+    cb(null, true);
+  },
+});
+
+app.post('/api/upload-image', authMiddleware, uploadImage.single('file'), (req, res) => {
+  res.json({
+    success: true,
+    url: `/uploads/${req.file.filename}`,
+  });
+});
+
 app.put('/api/content', async (req, res, next) => {
   try {
     
